@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spiced · Settings harness</title>
+<link rel="icon" href="data:,">
+<style>
+  :root { color-scheme: dark; --background-base:#121212; --text-base:#fff; --text-subdued:#b3b3b3; }
+  :root[data-theme="light"] { color-scheme:light; --background-base:#fff; --text-base:#181818; --text-subdued:#535353; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--background-base); color:var(--text-base); font:14px/1.5 system-ui,sans-serif; }
+  nav { display:flex; align-items:center; gap:12px; padding:16px; flex-wrap:wrap; }
+  nav span { margin-right:auto; color:var(--text-subdued); }
+  button { font:inherit; cursor:pointer; border:1px solid #777; border-radius:999px; padding:8px 16px; background:transparent; color:inherit; }
+  dialog { width:min(720px,calc(100% - 32px)); max-height:calc(100vh - 40px); padding:24px; border:0; border-radius:12px; background:var(--background-base); color:var(--text-base); }
+  dialog::backdrop { background:rgb(0 0 0 / .65); }
+  .modal-heading { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .modal-heading h1 { font-size:20px; margin:0; }
+  .modal-heading button { border:0; font-size:20px; line-height:1; padding:8px; }
+  #menu { display:flex; gap:8px; }
+</style>
+<nav aria-label="Preview controls">
+  <span>Browser harness · mock Spicetify APIs</span>
+  <button id="theme" type="button">Use light theme</button>
+  <div id="menu"></div>
+</nav>
+<script>
+  const theme = document.querySelector('#theme');
+  theme.onclick = () => {
+    const light = document.documentElement.dataset.theme !== 'light';
+    document.documentElement.dataset.theme = light ? 'light' : 'dark';
+    theme.textContent = light ? 'Use dark theme' : 'Use light theme';
+  };
+  let modal;
+  window.Spicetify = {
+    LocalStorage: { get: key => localStorage.getItem(key), set: (key,value) => localStorage.setItem(key,value) },
+    Menu: { Item: class {
+      constructor(name,_checked,onClick) { this.button = document.createElement('button'); this.button.textContent = name; this.button.onclick = onClick; }
+      register() { document.querySelector('#menu').append(this.button); }
+      deregister() { this.button.remove(); }
+    } },
+    PopupModal: {
+      display({title,content}) {
+        this.hide();
+        modal = document.createElement('dialog');
+        modal.setAttribute('aria-labelledby','modal-title');
+        const header = document.createElement('div'); header.className = 'modal-heading';
+        const heading = document.createElement('h1'); heading.id = 'modal-title'; heading.textContent = title;
+        const close = document.createElement('button'); close.textContent = '×'; close.setAttribute('aria-label','Close settings'); close.onclick = () => this.hide();
+        header.append(heading,close); modal.append(header,content); document.body.append(modal);
+        modal.addEventListener('cancel', event => { event.preventDefault(); this.hide(); });
+        modal.showModal();
+      },
+      hide() { modal?.close(); modal?.remove(); modal = undefined; }
+    },
+    showNotification: message => console.info(message)
+  };
+</script>
+<script src="/dist/spiced.js"></script>
+</html>
