@@ -29,7 +29,7 @@ The profile menu exposes **Spiced settings**. Spicetify owns the surrounding mod
 
 Settings use semantic labels, keyboard-operable switches, status messages, orange accents, Spotify theme tokens, and explicit fallback colors. A shared SVG chili mark identifies Spiced in the settings header and profile menu. Settings styles are scoped under `.spiced-settings`; Spotify modifications have their compatibility hooks reviewed separately.
 
-Features can declare boolean `options` and an `optionsLabel`. The settings view renders a keyboard-accessible disclosure with labeled switches and a fieldset. Choices remain editable with the master switch off. `SettingsModel.setOption(featureId, optionId, enabled)` saves a choice; an active feature is cleaned up and reactivated with the updated options, while an inactive feature stays inactive.
+Features can declare boolean `options` and an `optionsLabel`. The settings view renders a keyboard-accessible disclosure with labeled checkboxes and a fieldset. Choices remain editable with the master switch off. `SettingsModel.setOption(featureId, optionId, enabled)` saves a choice; an active feature is cleaned up and reactivated with the updated options, while an inactive feature stays inactive.
 
 ## Included features
 

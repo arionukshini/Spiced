@@ -163,7 +163,11 @@ describe("settings view", () => {
     setSnapshot({ enabled: true, status: "pending" });
     expect(details.open).toBe(true);
     expect(document.activeElement).toBe(checkbox);
+    expect(details.querySelector(".spiced-options-note")?.textContent).toBe("Applying your choices…");
+    setSnapshot({ status: "enabled" });
     expect(details.querySelector(".spiced-options-note")?.textContent).toContain("immediately");
+    setSnapshot({ status: "unsupported", message: "Missing capability" });
+    expect(details.querySelector(".spiced-options-note")?.textContent).toContain("Check the feature status above");
     expect(checkbox.disabled).toBe(false);
     view.remove();
     expect(listeners.size).toBe(0);

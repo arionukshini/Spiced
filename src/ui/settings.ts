@@ -180,9 +180,13 @@ class SettingsElement extends HTMLElement {
     const view = row.options;
     view.summary.textContent = snapshot.definition.optionsLabel ?? "Options";
     view.legend.textContent = `${snapshot.definition.name} options`;
-    view.note.textContent = snapshot.enabled
-      ? "Selected options apply immediately."
-      : "Your choices apply when this feature is on.";
+    view.note.textContent = !snapshot.enabled
+      ? "Your choices apply when this feature is on."
+      : snapshot.status === "enabled"
+        ? "Selected options apply immediately."
+        : snapshot.status === "pending"
+          ? "Applying your choices…"
+          : "These choices cannot be applied yet. Check the feature status above.";
     const currentIds = new Set(options.map(({ definition }) => definition.id));
     for (const [id, option] of view.rows) {
       if (!currentIds.has(id)) {
