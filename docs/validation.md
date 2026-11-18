@@ -83,3 +83,25 @@ A fresh `npm ci` followed by `npm run check` passed local type checking, all **3
 The full npm audit currently reports **five high-severity affected development packages** stemming from the Picomatch advisory [GHSA-fc5q-39xc-vjpf](https://github.com/advisories/GHSA-fc5q-39xc-vjpf). The advisory lists all published versions through 4.0.7 as affected and no patched version as of this check. The dependency is used by Vitest/Vite tooling and is absent from the bundled Spotify extension. `npm audit --omit=dev` reports **zero vulnerabilities**. No forced downgrade or unverified dependency override was applied; Dependabot is configured to check for updates.
 
 The repository remains unlicensed at the owner's request, with `license: "UNLICENSED"` and `private: true` in package metadata.
+
+## Artwork effects — v0.5.0
+
+`npm run check` passed strict typing, **50 tests across eight files**, and the production build. The standalone `dist/spiced.js` bundle is **39,614 bytes**, with no runtime npm dependencies. New tests cover speed validation/defaults/persistence, accessible select focus, playback event updates, exact listener cleanup, independent stylesheet removal, missing APIs, and current wrapper fallbacks when testing attributes are absent.
+
+`npm run local:apply` built, copied and applied the extension through Spicetify 2.46.7, preserving registrations. The final release/applied SHA-256 matched: `09CF523CF2BAEB1A5F8AE3E9CA7FEB61C7CB293F951DDA0134EFC25797FCEDB2`.
+
+In the Chromium harness, Fast computed to **10s**, playback changed animation state from **paused** to **running**, the computed rotation angle advanced between observations, and pause stopped it. Reload restored Fast and both enabled choices. Disabling CD removed its animation, hub and stylesheet while the independent shadow-fix stylesheet remained. The shadow fixture computed `box-shadow: none`. Light/dark settings were inspected; a light-theme screenshot is in ignored `output/playwright/v0.5-cd-light.jpg`. These are fixture results, not native measurements.
+
+The new effects are opt-in. Rotation adds continuous visual work while playing; no Spotify RAM or frame-rate improvement is claimed. Native reduced-motion mode, videos/Canvas, every theme, prolonged use and all Spotify surfaces are outside this acceptance run.
+
+Native v0.5 acceptance used the Windows Spotify client (`app.last-launched-version` 1.3.4.258.gc60b10b0946a). Both switches were enabled in Spotify, and the native speed select changed from Normal to Fast with saved feedback. Restarting restored both desired states and Fast. That check exposed an early `Player.isPlaying()` call before playback origin was ready; the final implementation starts paused safely and refreshes on playback/track events. A regression test covers this exact startup sequence.
+
+The final native settings showed **5 of 6 features active**, both new effects **On**, and **Fast · 10 seconds** restored after application/restart. The bottom player and large Now Playing cover both displayed the CD hub. Host pseudo-element blur and sizing initially affected the large hub; the final scoped hub rule explicitly resets those properties. In a corresponding browser fixture, the hub computed to **28.15px** on 128px artwork and `filter: none`, despite a host blur rule.
+
+Native playback was started, artwork orientation visibly changed while the track progressed, and playback was paused again at approximately 0:15. The effects remain enabled at Fast. Native proof is saved in ignored `output/playwright/v0.5-native-cd.png`; this is an actual Spotify capture. Native feature-off cleanup was not separately established in the final acceptance pass; CSS removal and exact event unsubscription were verified in automated tests and the browser harness. No performance profiling is claimed.
+
+## Centre overlay removal — v0.5.1
+
+Removed the CD hub pseudo-element at the user's request. Circular clipping, rotation speeds, playback-aware pause and saved preferences remain. Updated settings copy and feature documentation. `npm run check` passed all **50 tests** and the release build; `npm run local:apply` installed the release. Release and applied SHA-256 matched: `45E2284EC3AF876B9720EB4968CFEC26A9ECE68B13203B329B5B366033130B40`. In the browser fixture the player pseudo-element computed `content: none`, while playback still used `spiced-cd-rotate` with `animation-play-state: running`.
+
+Native Spotify inspection confirmed that both the bottom-player artwork and the loaded large Now Playing artwork show their original image centres without the overlay. Existing feature preferences were preserved.

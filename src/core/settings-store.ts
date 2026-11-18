@@ -7,6 +7,7 @@ const log = logger("settings");
 
 export class SettingsStore {
   private values: Record<string, boolean> = Object.create(null) as Record<string, boolean>;
+  private choices: Record<string, string> = Object.create(null) as Record<string, string>;
   private writable = true;
   private status: PersistenceStatus = { saved: true, message: "Changes save automatically" };
 
@@ -26,6 +27,11 @@ export class SettingsStore {
       if (!data.features || typeof data.features !== "object" || Array.isArray(data.features)) {
         throw new Error("Invalid feature settings");
       }
+      if ("choices" in data && data.choices && typeof data.choices === "object" && !Array.isArray(data.choices)) {
+        for (const [id, value] of Object.entries(data.choices)) {
+          if (typeof value === "string") this.choices[id] = value;
+        }
+      }
       for (const [id, enabled] of Object.entries(data.features)) {
         if (typeof enabled === "boolean") this.values[id] = enabled;
       }
@@ -40,11 +46,22 @@ export class SettingsStore {
     return this.values[id] ?? fallback;
   }
 
+  getChoice(id: string, fallback: string): string { return this.choices[id] ?? fallback; }
+
+  setChoice(id: string, value: string): void {
+    this.choices[id] = value;
+    this.save();
+  }
+
   set(id: string, enabled: boolean): void {
     this.values[id] = enabled;
+    this.save();
+  }
+
+  private save(): void {
     try {
       if (!this.storage || !this.writable) throw new Error("Persistent settings are unavailable");
-      this.storage.set(SETTINGS_KEY, JSON.stringify({ version: 1, features: this.values }));
+      this.storage.set(SETTINGS_KEY, JSON.stringify({ version: 1, features: this.values, choices: this.choices }));
       this.status = { saved: true, message: "All changes saved" };
     } catch (error) {
       this.status = { saved: false, message: this.writable

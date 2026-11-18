@@ -10,6 +10,7 @@ interface FeatureRow {
   status: HTMLElement;
   message: HTMLElement;
   retry: HTMLButtonElement;
+  choices?: Map<string, { row: HTMLElement; input: HTMLSelectElement }>;
   options?: {
     disclosure: HTMLDetailsElement;
     summary: HTMLElement;
@@ -259,6 +260,34 @@ class SettingsElement extends HTMLElement {
       row.retry.textContent = snapshot.status === "unsupported" ? "Check again" : "Try again";
       row.retry.setAttribute("aria-label", `${row.retry.textContent}: ${snapshot.definition.name}`);
       this.updateOptions(row, snapshot);
+      row.choices ??= new Map();
+      for (const choice of snapshot.choices ?? []) {
+        let control = row.choices.get(choice.definition.id);
+        if (!control) {
+          const label = element("label", "spiced-choice");
+          const name = element("span", "spiced-option-name", choice.definition.name);
+          const input = document.createElement("select");
+          input.id = `${this.viewId}-${snapshot.definition.id}-choice-${choice.definition.id}`;
+          label.htmlFor = input.id;
+          name.id = `${input.id}-name`;
+          input.setAttribute("aria-labelledby", name.id);
+          const description = element("span", "spiced-option-description", choice.definition.description);
+          description.id = `${input.id}-description`;
+          input.setAttribute("aria-describedby", description.id);
+          for (const item of choice.definition.values) {
+            const option = document.createElement("option");
+            option.value = item.value;
+            option.textContent = item.label;
+            input.append(option);
+          }
+          input.addEventListener("change", () => this.run(() => this.model!.setChoice(snapshot.definition.id, choice.definition.id, input.value)));
+          label.append(name, input, description);
+          row.row.append(label);
+          control = { row: label, input };
+          row.choices.set(choice.definition.id, control);
+        }
+        control.input.value = choice.value;
+      }
     }
     for (const category of categories) {
       const group = this.groups.get(category.id)!;

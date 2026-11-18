@@ -56,3 +56,7 @@ Do not report a percentage improvement until repeated comparisons exceed normal 
 For each additional supplied snippet, first identify duplicate rules, broad selectors, recurring DOM scans, permanent observers, and costly visual effects. Migrate and measure one snippet at a time. Remove only demonstrated duplication or unnecessary work; do not introduce cache cleaners, automatic memory purges, or undocumented client patches.
 
 All current features are stylesheet-based and add no recurring feature JavaScript. Development watching and bounded startup readiness checks should be accounted for separately from steady-state extension overhead. Apply changes using `npm run local:apply` and test them in Spotify. Real performance comparisons still need the repeatable measurements above, even when lifecycle tests and visual acceptance checks pass.
+
+## Spinning CD artwork
+
+This optional visual effect adds continuous CSS rotation while audio plays. It is a visual cost, not a performance improvement. It animates only the artwork images with the independent `rotate` property, pauses with playback, and respects reduced motion. It has two playback-state subscriptions and no progress subscription, timer, observer, permanent `will-change`, or animated filter. Disable it when comparing baseline performance. The separate shadow fix removes only the targeted artwork shadows and filters; no memory or frame-rate improvement is claimed.

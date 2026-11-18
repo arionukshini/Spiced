@@ -1,0 +1,11 @@
+:is(:is([data-testid="cover-art-slot"], .main-nowPlayingView-coverArtContainer), button[data-testid="cover-art-button"], .main-nowPlayingView-coverArt) {
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+:is([data-testid="cover-art-slot"], .main-nowPlayingView-coverArtContainer) :is(.main-nowPlayingView-coverArtVisualEnhancement, .main-nowPlayingView-coverArt, img),
+button[data-testid="cover-art-button"] img {
+  box-shadow: none !important;
+  filter: none !important;
+}

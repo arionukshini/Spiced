@@ -4,6 +4,11 @@ export interface StorageAPI {
 }
 
 export interface SpicetifyAPI {
+  Player?: {
+    isPlaying(): boolean;
+    addEventListener(type: string, callback: () => void): void;
+    removeEventListener(type: string, callback: () => void): void;
+  };
   LocalStorage?: StorageAPI;
   Menu?: {
     Item: new (name: string, checked: boolean, onClick: () => void, icon?: string) => {

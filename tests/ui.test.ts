@@ -24,6 +24,7 @@ function setup(feature = definition) {
       snapshot = { ...snapshot, options: snapshot.options?.map(option => option.definition.id === optionId ? { ...option, enabled } : option) };
       emit();
     }),
+    setChoice: vi.fn(async () => {}),
     retry: vi.fn(async () => {}),
   };
   const open = () => {

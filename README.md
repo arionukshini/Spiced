@@ -24,6 +24,8 @@ Spiced does not promise to reduce Spotify's internal RAM usage. The focus is sma
 | Round album covers | Appearance | On | Circular library, player, and playlist-menu artwork, with softly rounded main covers and thumbnails. |
 | Snappier controls | Interface | On | Shorter selected control transitions while preserving hover and loading timing. |
 | Hide icons | Interface | Off | Hide selected TV mode, What’s New, and Listening activity header shortcuts. |
+| Circular artwork shadow fix | Appearance | Off | Remove square shadows around circular player artwork. |
+| Spinning CD artwork | Appearance | Off | Circular artwork with playback-aware rotation and four speeds. |
 | Orange preview border | Appearance | Off | A removable CSS demonstration inside Spiced settings. |
 
 ## Build on Windows
@@ -75,6 +77,8 @@ spicetify apply
 ```
 
 Unregistering preserves preferences. Spiced never clears other extensions' storage.
+
+Both new artwork effects are under **Appearance** and start off. **Spinning CD artwork** has a **Rotation speed** selector: 10, 30 (default), 60 or 360 seconds per turn. It targets the current bottom-player and Now Playing artwork wrappers, pauses with playback, and keeps a static CD when reduced motion is requested. Speed changes apply live. **Circular artwork shadow fix** is independent of both spinning and Round album covers.
 
 ## Development and debugging
 

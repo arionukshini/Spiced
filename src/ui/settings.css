@@ -104,6 +104,9 @@
 .spiced-settings .spiced-option-copy { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
 .spiced-settings .spiced-option-name { font-size: 12px; font-weight: 600; }
 .spiced-settings .spiced-option-description { color: var(--spiced-muted); font-size: 11px; }
+.spiced-settings .spiced-choice { display: grid; gap: 6px; margin-top: 14px; }
+.spiced-settings .spiced-choice select { width: 100%; max-width: 260px; min-height: 36px; padding: 6px 10px; border: 1px solid var(--spiced-line); border-radius: 8px; background: var(--spiced-bg); color: var(--spiced-fg); font: inherit; color-scheme: normal; }
+.spiced-settings .spiced-choice select:focus-visible { outline: 2px solid var(--spiced-accent); outline-offset: 3px; }
 .spiced-settings .spiced-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .spiced-settings .spiced-feature-message { margin-top: 6px; font-size: 12px; }
 .spiced-settings [data-status="unsupported"] .spiced-feature-message,

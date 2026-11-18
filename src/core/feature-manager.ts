@@ -6,6 +6,7 @@ import type { Cleanup, FeatureDefinition, FeatureEnvironment, FeatureSnapshot, S
 
 interface Entry extends FeatureSnapshot {
   optionValues: Record<string, boolean>;
+  choiceValues: Record<string, string>;
   scope?: ResourceScope;
   operation: Promise<void>;
   revision: number;
@@ -35,9 +36,17 @@ export class FeatureManager implements SettingsModel {
         }
         optionValues[option.id] = store.get(`${definition.id}.${option.id}`, option.defaultEnabled);
       }
+      const choiceValues: Record<string, string> = Object.create(null) as Record<string, string>;
+      for (const choice of definition.choices ?? []) {
+        if (!/^[a-z][a-z0-9-]*$/.test(choice.id) || Object.hasOwn(choiceValues, choice.id) || !choice.values.some(item => item.value === choice.defaultValue)) {
+          throw new Error(`Invalid choice in ${definition.id}: ${choice.id}`);
+        }
+        const saved = store.getChoice(`${definition.id}.${choice.id}`, choice.defaultValue);
+        choiceValues[choice.id] = choice.values.some(item => item.value === saved) ? saved : choice.defaultValue;
+      }
       this.entries.set(definition.id, {
         definition, enabled: store.get(definition.id, definition.defaultEnabled),
-        optionValues, status: "disabled", operation: Promise.resolve(), revision: 0,
+        optionValues, choiceValues, status: "disabled", operation: Promise.resolve(), revision: 0,
       });
     }
   }
@@ -47,8 +56,9 @@ export class FeatureManager implements SettingsModel {
   }
 
   getSnapshot(): FeatureSnapshot[] {
-    return [...this.entries.values()].map(({ definition, enabled, status, message, optionValues }) => ({
+    return [...this.entries.values()].map(({ definition, enabled, status, message, optionValues, choiceValues }) => ({
       definition, enabled, status, message,
+      choices: definition.choices?.map(choice => ({ definition: choice, value: choiceValues[choice.id]! })),
       options: definition.options?.map(option => ({ definition: option, enabled: optionValues[option.id]! })),
     }));
   }
@@ -88,6 +98,22 @@ export class FeatureManager implements SettingsModel {
       this.emit();
       return Promise.resolve();
     }
+    try { this.cleanup(entry); } catch (error) {
+      ++entry.revision;
+      this.fail(entry, error);
+      return Promise.resolve();
+    }
+    return this.queue(entry);
+  }
+
+  setChoice(id: string, choiceId: string, value: string): Promise<void> {
+    if (this.disposed) return Promise.resolve();
+    const entry = this.getEntry(id);
+    const definition = entry.definition.choices?.find(choice => choice.id === choiceId);
+    if (!definition?.values.some(item => item.value === value)) throw new Error(`Invalid choice: ${id}.${choiceId}`);
+    entry.choiceValues[choiceId] = value;
+    this.store.setChoice(`${id}.${choiceId}`, value);
+    if (!entry.enabled) { this.emit(); return Promise.resolve(); }
     try { this.cleanup(entry); } catch (error) {
       ++entry.revision;
       this.fail(entry, error);
@@ -154,6 +180,7 @@ export class FeatureManager implements SettingsModel {
     entry.scope = scope;
     const context = {
       ...this.environment,
+      choices: Object.freeze({ ...entry.choiceValues }),
       options: Object.freeze({ ...entry.optionValues }),
       signal: scope.signal,
       onCleanup: scope.onCleanup,

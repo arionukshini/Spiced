@@ -75,7 +75,7 @@ Preferences are stored through documented `Spicetify.LocalStorage` under the nam
 
 This storage is account-generic within the client, not synchronized across devices or isolated per Spotify account. Spicetify documents that account-specific storage is a different API. [LocalStorage reference](https://spicetify.app/docs/development/api-wrapper/methods/local-storage)
 
-Schema 1 remains unchanged: master preferences use the feature ID; options use `<feature-id>.<option-id>` keys in the same boolean map. Existing preferences are preserved, with no migration or reset. Unknown keys are retained, nonboolean values are ignored, and absent values fall back to feature or option defaults. Unsupported schema versions are preserved and remain read-only. Storage failures leave settings usable for the current session and show an explicit persistence message. A successful later toggle retries a normal failed save.
+Schema 1 retains its boolean feature map and adds an optional string `choices` map for enumerated settings such as `spinning-cd.speed`. Allowed choices are validated against feature metadata, and invalid saved choices use defaults. Master preferences use the feature ID; options use `<feature-id>.<option-id>` keys in the same boolean map. Existing preferences are preserved, with no migration or reset. Unknown keys are retained, nonboolean values are ignored, and absent values fall back to feature or option defaults. Unsupported schema versions are preserved and remain read-only. Storage failures leave settings usable for the current session and show an explicit persistence message. A successful later toggle retries a normal failed save.
 
 ## Build and validation boundaries
 
@@ -84,3 +84,7 @@ TypeScript runs before release builds. esbuild produces a minified browser IIFE;
 `npm run preview` builds the extension and starts a browser preview using a mock Spicetify host. It is useful for checking settings layout and controls, but does not establish integration with the real Spotify client or its modal implementation.
 
 Automated tests validate core lifecycle and settings behavior in a simulated environment. They do not establish compatibility with every Spotify release, theme, or other extension. Native modal behavior, theme integration, persistence after a real Spotify restart, and performance traces still require local acceptance testing. [Performance guidance](performance.md)
+
+## Artwork effects (v0.5)
+
+`circular-shadow-fix` and `spinning-cd` are independent, opt-in Appearance features. Both use current cover-art wrapper hooks, with `.main-nowPlayingView-coverArtContainer` as a fallback when testing attributes are missing. The CD feature animates images with CSS `rotate` so Spotify's wrapper layout transforms remain intact. The artwork stays unobstructed, with no centre overlay. Playback uses the documented [Player events](https://spicetify.app/docs/development/api-wrapper/methods/player) with `onplaypause` and `songchange` subscriptions; cleanup removes that subscription, its owned root state attribute, and CSS. No progress events, observers, or polling are needed. The effect is static under reduced motion and is unavailable when the required playback APIs or CSS rotate support are missing. It does not restyle all player buttons or animate unrelated images.

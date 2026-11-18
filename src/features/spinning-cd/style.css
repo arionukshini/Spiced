@@ -1,0 +1,17 @@
+@keyframes spiced-cd-rotate { to { rotate: 1turn; } }
+:is([data-testid="cover-art-slot"], .main-nowPlayingView-coverArtContainer, button[data-testid="cover-art-button"]) {
+  border-radius: 50% !important;
+  overflow: hidden !important;
+}
+:is([data-testid="cover-art-slot"], .main-nowPlayingView-coverArtContainer, button[data-testid="cover-art-button"]) img {
+  border-radius: 50% !important;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :is([data-testid="cover-art-slot"], .main-nowPlayingView-coverArtContainer, button[data-testid="cover-art-button"]) img {
+    animation: spiced-cd-rotate var(--spiced-cd-duration, 30s) linear infinite !important;
+    animation-play-state: paused !important;
+  }
+  :root[data-spiced-cd-playing="true"] :is([data-testid="cover-art-slot"], .main-nowPlayingView-coverArtContainer, button[data-testid="cover-art-button"]) img {
+    animation-play-state: running !important;
+  }
+}

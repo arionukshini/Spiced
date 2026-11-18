@@ -17,6 +17,7 @@ export type SupportResult = { supported: true } | { supported: false; reason: st
 
 export interface FeatureContext extends FeatureEnvironment {
   options: Readonly<Record<string, boolean>>;
+  choices: Readonly<Record<string, string>>;
   signal: AbortSignal;
   addStyle(css: string): void;
   onCleanup(cleanup: Cleanup): void;
@@ -31,12 +32,21 @@ export interface FeatureOptionDefinition {
   defaultEnabled: boolean;
 }
 
+export interface FeatureChoiceDefinition {
+  id: string;
+  name: string;
+  description: string;
+  defaultValue: string;
+  values: readonly { value: string; label: string }[];
+}
+
 export interface FeatureDefinition {
   id: string;
   name: string;
   description: string;
   category: Category;
   defaultEnabled: boolean;
+  choices?: readonly FeatureChoiceDefinition[];
   optionsLabel?: string;
   options?: readonly FeatureOptionDefinition[];
   checkSupport?: (environment: FeatureEnvironment) => SupportResult;
@@ -50,6 +60,7 @@ export interface FeatureSnapshot {
   status: FeatureStatus;
   message?: string;
   options?: readonly { definition: FeatureOptionDefinition; enabled: boolean }[];
+  choices?: readonly { definition: FeatureChoiceDefinition; value: string }[];
 }
 
 export interface SettingsModel {
@@ -57,6 +68,7 @@ export interface SettingsModel {
   subscribe(listener: Cleanup): Cleanup;
   setEnabled(id: string, enabled: boolean): Promise<void>;
   setOption(id: string, optionId: string, enabled: boolean): Promise<void>;
+  setChoice(id: string, choiceId: string, value: string): Promise<void>;
   retry(id: string): Promise<void>;
 }
 

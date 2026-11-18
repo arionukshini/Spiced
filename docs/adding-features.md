@@ -112,3 +112,7 @@ For JavaScript changes, test partial activation failure, callback failure, cance
 Remove the `orangeDemo` import and array entry from `src/features/index.ts`, then remove `src/features/orange-demo/`. The old stored preference is harmless and need not be deleted.
 
 Optionally remove the demo preview creation block in `src/ui/settings.ts`, its preview-specific rules in `src/ui/settings.css`, and the unused `demoPreview` compatibility selector. Update tests that intentionally refer to the demonstration. Keep the general feature system, persistence, settings controls, and orange branding.
+
+## Select choices
+
+For an enumerated option, declare `choices: [{ id, name, description, defaultValue, values: [{ value, label }] }]`. The shared UI supplies a labeled native select; `setChoice` validates values, persists them and reactivates only the affected feature. Read the frozen `context.choices` record in activation. See `spinning-cd` for speed selection and playback-event cleanup. Choices save in an optional schema-1 `choices` map beside the unchanged boolean `features` map. Old boolean preferences are retained; unknown or invalid speed values fall back to the declared default. Downgrading to an older Spiced build can discard the additional choices map on its next save.
