@@ -7,8 +7,9 @@ const definition: FeatureDefinition = {
   category: "appearance", defaultEnabled: false, activate: () => {},
 };
 
-function setup() {
-  let snapshot: FeatureSnapshot = { definition, enabled: false, status: "disabled" };
+function setup(feature = definition) {
+  let snapshot: FeatureSnapshot = { definition: feature, enabled: false, status: "disabled",
+    options: feature.options?.map(option => ({ definition: option, enabled: option.defaultEnabled })) };
   let persistence: PersistenceStatus = { saved: true, message: "All changes saved" };
   const listeners = new Set<() => void>();
   const emit = () => { for (const listener of listeners) listener(); };
@@ -17,6 +18,10 @@ function setup() {
     subscribe: listener => { listeners.add(listener); return () => { listeners.delete(listener); }; },
     setEnabled: vi.fn(async (_id, enabled) => {
       snapshot = { ...snapshot, enabled, status: enabled ? "enabled" : "disabled" };
+      emit();
+    }),
+    setOption: vi.fn(async (_id, optionId, enabled) => {
+      snapshot = { ...snapshot, options: snapshot.options?.map(option => option.definition.id === optionId ? { ...option, enabled } : option) };
       emit();
     }),
     retry: vi.fn(async () => {}),
@@ -121,5 +126,46 @@ describe("settings view", () => {
     setPersistence({ saved: true, message: "All changes saved" });
     expect(notice.dataset.saved).toBe("true");
     expect(notice.textContent).toBe("All changes saved");
+  });
+
+  it("keeps sub-options editable while the feature is off and preserves expansion and focus", async () => {
+    const feature: FeatureDefinition = {
+      id: "hide-icons", name: "Hide icons", description: "Choose header shortcuts to hide.",
+      category: "interface", defaultEnabled: false, optionsLabel: "Choose icons", activate: () => {},
+      options: [
+        { id: "tv-mode", name: "TV mode", description: "Monitor shortcut.", defaultEnabled: true },
+        { id: "whats-new", name: "What's new", description: "Notification bell.", defaultEnabled: true },
+        { id: "friend-activity", name: "Listening activity", description: "Friends shortcut.", defaultEnabled: true },
+      ],
+    };
+    const { view, model, setSnapshot, listeners } = setup(feature);
+    const details = view.querySelector("details")!;
+    expect(details.querySelector("summary")?.textContent).toBe("Choose icons");
+    expect(details.querySelector("legend")?.textContent).toBe("Hide icons options");
+    expect(details.querySelectorAll('input[type="checkbox"]')).toHaveLength(3);
+    expect(view.querySelector(".spiced-summary")?.textContent).toBe("0 of 1 feature active");
+    expect(details.querySelector(".spiced-options-note")?.textContent).toContain("when this feature is on");
+    details.open = true;
+    const checkbox = details.querySelector<HTMLInputElement>("input")!;
+    expect(checkbox.disabled).toBe(false);
+    expect(document.getElementById(checkbox.getAttribute("aria-labelledby")!)?.textContent).toBe("TV mode");
+    expect(document.getElementById(checkbox.getAttribute("aria-describedby")!)?.textContent).toBe("Monitor shortcut.");
+    checkbox.focus();
+    checkbox.checked = false;
+    checkbox.dispatchEvent(new Event("change", { bubbles: true }));
+    await Promise.resolve();
+    expect(model.setOption).toHaveBeenCalledWith("hide-icons", "tv-mode", false);
+    expect(view.querySelector<HTMLInputElement>('[role="switch"]')?.checked).toBe(false);
+    expect(details.open).toBe(true);
+    expect(details.querySelector("input")).toBe(checkbox);
+    expect(document.activeElement).toBe(checkbox);
+    expect(checkbox.checked).toBe(false);
+    setSnapshot({ enabled: true, status: "pending" });
+    expect(details.open).toBe(true);
+    expect(document.activeElement).toBe(checkbox);
+    expect(details.querySelector(".spiced-options-note")?.textContent).toContain("immediately");
+    expect(checkbox.disabled).toBe(false);
+    view.remove();
+    expect(listeners.size).toBe(0);
   });
 });

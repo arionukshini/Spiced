@@ -1,0 +1,35 @@
+name: Bug report
+description: Report a broken feature, compatibility issue, or settings problem.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Include the expected behavior and the affected Spiced feature.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Describe the steps, including whether toggling the feature off changes the result.
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Include Spiced, Spotify, Spicetify, and your operating system.
+    validations:
+      required: true
+  - type: textarea
+    id: customizations
+    attributes:
+      label: Theme and relevant modifications
+      description: List the theme, snippets, or extensions that may affect this surface.
+  - type: textarea
+    id: errors
+    attributes:
+      label: Relevant console error
+      description: Optional; keep logs focused on the error.
+      render: text

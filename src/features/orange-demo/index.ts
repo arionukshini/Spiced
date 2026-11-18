@@ -1,5 +1,5 @@
 import type { FeatureDefinition } from "../../core/types";
-import css from "./style.css";
+import css from "./style.css?raw";
 
 export const orangeDemo: FeatureDefinition = {
   id: "orange-demo",

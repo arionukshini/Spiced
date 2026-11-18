@@ -28,16 +28,14 @@
 .spiced-settings .spiced-mark {
   display: grid;
   place-items: center;
-  width: 31px;
-  height: 31px;
-  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 11px;
   background: var(--spiced-accent);
   color: var(--spiced-on-accent);
-  font-size: 26px;
-  font-weight: 850;
-  font-style: italic;
-  line-height: 1;
 }
+.spiced-settings .spiced-mark svg { display: block; width: 26px; height: 26px; }
 .spiced-settings .spiced-wordmark { font-size: 22px; font-weight: 750; letter-spacing: -.7px; }
 .spiced-settings .spiced-version {
   margin-left: auto;
@@ -87,6 +85,25 @@
 .spiced-settings .spiced-feature-status { color: var(--spiced-muted); font-size: 11px; }
 .spiced-settings [data-status="enabled"] .spiced-feature-status { color: var(--spiced-accent-ink); }
 .spiced-settings .spiced-feature-description { margin-top: 4px; max-width: 430px; color: var(--spiced-muted); font-size: 12px; }
+.spiced-settings .spiced-options {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--spiced-line);
+  border-radius: 10px;
+  background: var(--spiced-surface);
+}
+.spiced-settings .spiced-options-summary { font-size: 12px; font-weight: 600; cursor: pointer; }
+.spiced-settings .spiced-options-summary::marker { color: var(--spiced-muted); }
+.spiced-settings .spiced-options-summary:focus-visible { outline: 2px solid var(--spiced-accent); outline-offset: 4px; border-radius: 3px; }
+.spiced-settings .spiced-options-note { margin-top: 10px; color: var(--spiced-muted); font-size: 11px; }
+.spiced-settings .spiced-option-list { display: grid; gap: 12px; min-width: 0; margin: 12px 0 0; padding: 0; border: 0; }
+.spiced-settings .spiced-option { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+.spiced-settings .spiced-option input { flex: 0 0 17px; width: 17px; height: 17px; margin: 1px 0 0; accent-color: var(--spiced-accent); cursor: pointer; }
+.spiced-settings .spiced-option input:focus-visible { outline: 2px solid var(--spiced-accent); outline-offset: 3px; }
+.spiced-settings .spiced-option-copy { display: grid; gap: 2px; min-width: 0; }
+.spiced-settings .spiced-option-name { font-size: 12px; font-weight: 600; }
+.spiced-settings .spiced-option-description { color: var(--spiced-muted); font-size: 11px; }
+.spiced-settings .spiced-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .spiced-settings .spiced-feature-message { margin-top: 6px; font-size: 12px; }
 .spiced-settings [data-status="unsupported"] .spiced-feature-message,
 .spiced-settings [data-status="error"] .spiced-feature-message { color: var(--spiced-fg); }

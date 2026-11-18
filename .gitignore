@@ -1,7 +1,33 @@
+# Dependencies and generated output
 node_modules/
-dist/
-coverage/
-artifacts/
+/dist/
+/coverage/
+/artifacts/
+/output/
+/.cache/
+*.tsbuildinfo
+*.tmp
+
+# Browser validation output
+/.playwright-cli/
+/playwright-report/
+/test-results/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+!.env.*.example
+.npmrc
+*.local
+
+# Logs and editor/OS files
 *.log
-output/playwright/
-.playwright-cli/
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini

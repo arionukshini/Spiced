@@ -1,0 +1,81 @@
+.main-cardImage-image,
+.main-cardImage-imageWrapper,
+.main-entityHeader-image,
+.main-entityHeader-shadow,
+.main-entityHeader-imagePlaceholder,
+.main-entityHeader-imagePlaceholder > div {
+  border-radius: 10px !important;
+  overflow: hidden !important;
+}
+
+.x-categoryCard-image {
+  border-radius: 6px !important;
+}
+
+.view-homeShortcutsGrid-image,
+.view-homeShortcutsGrid-imageWrapper {
+  border-radius: 4px !important;
+}
+
+.main-trackList-rowImage {
+  border-radius: 3px !important;
+}
+
+.main-yourLibraryX-library [role="row"] img,
+.main-yourLibraryX-library [role="row"] [data-testid="entity-image"],
+[role="grid"][aria-label="Your Library"] [role="row"] img,
+[role="grid"][aria-label="Your Library"] [role="row"] [data-testid="entity-image"],
+.main-yourLibraryX-entryImage,
+.main-yourLibraryX-entryImageWrapper,
+.main-yourLibraryX-entryImageContainer,
+.main-yourLibraryX-libraryItem img,
+.main-yourLibraryX-entryImage img,
+.main-yourLibraryX-entry img {
+  border-radius: 50% !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.main-yourLibraryX-library [role="row"] .main-image-imageWrapper,
+.main-yourLibraryX-library [role="row"] .main-cardImage-imageWrapper,
+[role="grid"][aria-label="Your Library"] [role="row"] .main-image-imageWrapper,
+[role="grid"][aria-label="Your Library"] [role="row"] .main-cardImage-imageWrapper {
+  border-radius: 50% !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.main-contextMenu img,
+.main-addToPlaylistMenu img,
+.main-contextMenu .main-image-image,
+.main-addToPlaylistMenu .main-image-image,
+#context-menu ul[aria-label*="Add to playlist menu"] img {
+  border-radius: 50% !important;
+}
+
+.cover-art-image,
+.main-nowPlayingView-coverArt img,
+.main-coverSlotExpanded-container img,
+[data-testid="cover-art-slot"],
+[data-testid="cover-art-slot"] [data-testid="cover-art-image"],
+[data-testid="cover-art-button"],
+[data-testid="cover-art-slot"] img,
+[data-testid="cover-art-button"] img {
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.x-entityImage-circle,
+.x-entityImage-circle img,
+.main-cardImage-circular,
+.main-cardImage-circular img,
+.main-cardImage-circular .main-cardImage-image,
+.main-cardImage-circular .main-cardImage-imageWrapper,
+.main-entityHeader-circle,
+.main-entityHeader-circle img,
+.main-entityHeader-circle .main-entityHeader-image,
+.main-entityHeader-circle .main-entityHeader-imagePlaceholder {
+  border-radius: 50% !important;
+}

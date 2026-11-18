@@ -1,5 +1,6 @@
 import { categories } from "../core/types";
 import type { Cleanup, FeatureSnapshot, PersistenceStatus, SettingsModel } from "../core/types";
+import { spicedIcon } from "./brand-icon";
 
 interface FeatureRow {
   row: HTMLElement;
@@ -9,6 +10,14 @@ interface FeatureRow {
   status: HTMLElement;
   message: HTMLElement;
   retry: HTMLButtonElement;
+  options?: {
+    disclosure: HTMLDetailsElement;
+    summary: HTMLElement;
+    note: HTMLElement;
+    group: HTMLFieldSetElement;
+    legend: HTMLElement;
+    rows: Map<string, { row: HTMLElement; name: HTMLElement; description: HTMLElement; input: HTMLInputElement }>;
+  };
 }
 
 let nextViewId = 0;
@@ -60,7 +69,8 @@ class SettingsElement extends HTMLElement {
     this.className = "spiced-settings";
     const header = element("header", "spiced-header");
     const brand = element("div", "spiced-brand");
-    const mark = element("span", "spiced-mark", "s");
+    const mark = element("span", "spiced-mark");
+    mark.innerHTML = spicedIcon;
     mark.setAttribute("aria-hidden", "true");
     const wordmark = element("span", "spiced-wordmark", "spiced");
     const version = element("span", "spiced-version", `v${__VERSION__}`);
@@ -114,7 +124,8 @@ class SettingsElement extends HTMLElement {
   private createRow(snapshot: FeatureSnapshot): FeatureRow {
     const { definition } = snapshot;
     const id = `${this.viewId}-${definition.id}`;
-    const row = element("div", "spiced-feature");
+    const row = element("div", "spiced-feature-block");
+    const main = element("div", "spiced-feature");
     const copy = element("div", "spiced-feature-copy");
     const title = element("div", "spiced-feature-title");
     const name = element("label", "spiced-feature-name", definition.name);
@@ -143,8 +154,70 @@ class SettingsElement extends HTMLElement {
     const track = element("span", "spiced-switch-track");
     track.setAttribute("aria-hidden", "true");
     control.append(input, track);
-    row.append(copy, control);
+    main.append(copy, control);
+    row.append(main);
     return { row, name, description, input, status, message, retry };
+  }
+
+  private updateOptions(row: FeatureRow, snapshot: FeatureSnapshot): void {
+    const options = snapshot.options ?? [];
+    if (options.length === 0) {
+      row.options?.disclosure.remove();
+      row.options = undefined;
+      return;
+    }
+    if (!row.options) {
+      const disclosure = element("details", "spiced-options");
+      const summary = element("summary", "spiced-options-summary");
+      const note = element("p", "spiced-options-note");
+      const group = element("fieldset", "spiced-option-list");
+      const legend = element("legend", "spiced-visually-hidden");
+      group.append(legend);
+      disclosure.append(summary, note, group);
+      row.row.append(disclosure);
+      row.options = { disclosure, summary, note, group, legend, rows: new Map() };
+    }
+    const view = row.options;
+    view.summary.textContent = snapshot.definition.optionsLabel ?? "Options";
+    view.legend.textContent = `${snapshot.definition.name} options`;
+    view.note.textContent = snapshot.enabled
+      ? "Selected options apply immediately."
+      : "Your choices apply when this feature is on.";
+    const currentIds = new Set(options.map(({ definition }) => definition.id));
+    for (const [id, option] of view.rows) {
+      if (!currentIds.has(id)) {
+        option.row.remove();
+        view.rows.delete(id);
+      }
+    }
+    for (const option of options) {
+      let control = view.rows.get(option.definition.id);
+      if (!control) {
+        const id = `${this.viewId}-${snapshot.definition.id}-option-${option.definition.id}`;
+        const optionRow = element("label", "spiced-option");
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.id = id;
+        const copy = element("span", "spiced-option-copy");
+        const name = element("span", "spiced-option-name");
+        name.id = `${id}-name`;
+        const description = element("span", "spiced-option-description");
+        description.id = `${id}-description`;
+        input.setAttribute("aria-labelledby", name.id);
+        input.setAttribute("aria-describedby", description.id);
+        input.addEventListener("change", () => this.run(() => this.model!.setOption(snapshot.definition.id, option.definition.id, input.checked)));
+        optionRow.htmlFor = id;
+        copy.append(name, description);
+        optionRow.append(input, copy);
+        view.group.append(optionRow);
+        control = { row: optionRow, name, description, input };
+        view.rows.set(option.definition.id, control);
+      }
+      control.name.textContent = option.definition.name;
+      control.description.textContent = option.definition.description;
+      control.description.hidden = !option.definition.description;
+      control.input.checked = option.enabled;
+    }
   }
 
   private update(): void {
@@ -181,6 +254,7 @@ class SettingsElement extends HTMLElement {
       row.retry.hidden = snapshot.status !== "unsupported" && snapshot.status !== "error";
       row.retry.textContent = snapshot.status === "unsupported" ? "Check again" : "Try again";
       row.retry.setAttribute("aria-label", `${row.retry.textContent}: ${snapshot.definition.name}`);
+      this.updateOptions(row, snapshot);
     }
     for (const category of categories) {
       const group = this.groups.get(category.id)!;

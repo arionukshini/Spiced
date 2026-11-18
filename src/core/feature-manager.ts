@@ -5,6 +5,7 @@ import type { StyleRegistry } from "./style-registry";
 import type { Cleanup, FeatureDefinition, FeatureEnvironment, FeatureSnapshot, SettingsModel } from "./types";
 
 interface Entry extends FeatureSnapshot {
+  optionValues: Record<string, boolean>;
   scope?: ResourceScope;
   operation: Promise<void>;
   revision: number;
@@ -27,9 +28,16 @@ export class FeatureManager implements SettingsModel {
       if (!/^[a-z][a-z0-9-]*$/.test(definition.id) || this.entries.has(definition.id)) {
         throw new Error(`Invalid or duplicate feature ID: ${definition.id}`);
       }
+      const optionValues: Record<string, boolean> = Object.create(null) as Record<string, boolean>;
+      for (const option of definition.options ?? []) {
+        if (!/^[a-z][a-z0-9-]*$/.test(option.id) || Object.hasOwn(optionValues, option.id)) {
+          throw new Error(`Invalid or duplicate option ID in ${definition.id}: ${option.id}`);
+        }
+        optionValues[option.id] = store.get(`${definition.id}.${option.id}`, option.defaultEnabled);
+      }
       this.entries.set(definition.id, {
         definition, enabled: store.get(definition.id, definition.defaultEnabled),
-        status: "disabled", operation: Promise.resolve(), revision: 0,
+        optionValues, status: "disabled", operation: Promise.resolve(), revision: 0,
       });
     }
   }
@@ -39,7 +47,10 @@ export class FeatureManager implements SettingsModel {
   }
 
   getSnapshot(): FeatureSnapshot[] {
-    return [...this.entries.values()].map(({ definition, enabled, status, message }) => ({ definition, enabled, status, message }));
+    return [...this.entries.values()].map(({ definition, enabled, status, message, optionValues }) => ({
+      definition, enabled, status, message,
+      options: definition.options?.map(option => ({ definition: option, enabled: optionValues[option.id]! })),
+    }));
   }
 
   subscribe(listener: Cleanup): Cleanup {
@@ -65,6 +76,24 @@ export class FeatureManager implements SettingsModel {
   retry(id: string): Promise<void> {
     if (this.disposed) return Promise.resolve();
     return this.queue(this.getEntry(id));
+  }
+
+  setOption(id: string, optionId: string, enabled: boolean): Promise<void> {
+    if (this.disposed) return Promise.resolve();
+    const entry = this.getEntry(id);
+    if (!Object.hasOwn(entry.optionValues, optionId)) throw new Error(`Unknown option: ${id}.${optionId}`);
+    entry.optionValues[optionId] = enabled;
+    this.store.set(`${id}.${optionId}`, enabled);
+    if (!entry.enabled) {
+      this.emit();
+      return Promise.resolve();
+    }
+    try { this.cleanup(entry); } catch (error) {
+      ++entry.revision;
+      this.fail(entry, error);
+      return Promise.resolve();
+    }
+    return this.queue(entry);
   }
 
   private getEntry(id: string): Entry {
@@ -125,6 +154,7 @@ export class FeatureManager implements SettingsModel {
     entry.scope = scope;
     const context = {
       ...this.environment,
+      options: Object.freeze({ ...entry.optionValues }),
       signal: scope.signal,
       onCleanup: scope.onCleanup,
       guard: scope.guard,

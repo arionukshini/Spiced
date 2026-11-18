@@ -1,8 +1,15 @@
 {
   "name": "spiced",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "private": true,
-  "description": "A modular quality-of-life foundation for Spicetify.",
+  "description": "Modular quality-of-life improvements for Spotify through Spicetify.",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arionukshini/Spiced.git"
+  },
+  "bugs": { "url": "https://github.com/arionukshini/Spiced/issues" },
+  "homepage": "https://github.com/arionukshini/Spiced#readme",
   "type": "module",
   "engines": { "node": ">=22.16" },
   "scripts": {
@@ -11,6 +18,7 @@
     "watch": "node scripts/build.mjs --watch",
     "preview": "npm run build && node scripts/preview.mjs",
     "local:install": "npm run build && node scripts/install.mjs",
+    "local:apply": "npm run build && node scripts/apply.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "check": "npm run typecheck && npm test && node scripts/build.mjs"

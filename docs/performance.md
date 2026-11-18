@@ -1,6 +1,14 @@
 # Performance and measurement
 
-Spiced's first performance goal is to add very little work to Spotify. No Spotify speed or memory reduction has been measured or claimed for this foundation.
+Spiced's first performance goal is to add very little work to Spotify. **Snappier controls** shortens selected interface transitions to improve perceived responsiveness. This is a timing change, not evidence of reduced CPU use, RAM consumption, loading time, or rendering-engine work.
+
+## Snappier controls
+
+The default-enabled `snappy-controls` feature caps selected controls' `--encore-shortest-3` value at 75 ms. Spotify's inspected stylesheet currently sets that token to 150 ms. A root-captured cap preserves themes already using a shorter value, and the rules target semantic Encore control hooks instead of generated class names. Spiced's own switches use 60 ms.
+
+Existing 50 ms hover feedback is retained. The feature leaves the `--encore-shortest-2` and `--encore-shortest-4` values used by loading animation phases unchanged, and applies no blanket `animation-duration` override. The stylesheet runs only under `prefers-reduced-motion: no-preference`; users requesting reduced motion keep that behavior.
+
+Support detection checks for the root token and CSS duration-expression support once per activation or manual recheck. After activation the feature is CSS-only, with no background timers, DOM scans, observers, or listeners. Disabling removes its stylesheet immediately. Spotify updates and themes may change which controls consume these tokens, so actual affected surfaces should be rechecked after updates.
 
 ## What an extension can influence
 
@@ -9,6 +17,12 @@ Extensions execute alongside Spotify's code and can modify its interface. Spicet
 The documented API exposes UI integration, playback events, storage, and other client services. It does not document controls for Spotify's internal caches, garbage collector, process allocation, media decoding, or rendering engine. The conclusion for Spiced is that those internals are outside its supported optimization scope; this is an inference from the documented API surface, not proof that every internal mechanism is inaccessible. [Official API reference](https://spicetify.app/docs/development/api-wrapper)
 
 Hiding an element with CSS does not establish that Spotify stops fetching its data, updating its components, or holding its objects. A visual simplification can be useful without reducing RAM. Treat any stronger claim as an experiment requiring evidence.
+
+## Rounded artwork migration
+
+**Round album covers** is a visual CSS migration. Its rules change corner radii and selected wrapper clipping, backgrounds, and shadows. They do not reduce artwork downloads, image-cache size, or decoded image memory. Removing fragile positional rules and an unrelated navbar adjustment improves maintenance scope; it does not establish a measured speed improvement.
+
+The feature adds no listeners, observers, or recurring JavaScript. Confirm clipping and scrolling on the actual library/player surfaces, and inspect paint cost only if a reproducible regression appears. Disable the duplicate Marketplace snippet when comparing enabled and disabled states.
 
 ## Rules for future snippets
 
@@ -39,6 +53,6 @@ Do not report a percentage improvement until repeated comparisons exceed normal 
 
 ## Candidates for the next phase
 
-When existing snippets arrive, first identify duplicate rules, broad selectors, recurring DOM scans, permanent observers, and costly visual effects. Migrate and measure one snippet at a time. Remove only demonstrated duplication or unnecessary work; do not introduce cache cleaners, automatic memory purges, or undocumented client patches.
+For each additional supplied snippet, first identify duplicate rules, broad selectors, recurring DOM scans, permanent observers, and costly visual effects. Migrate and measure one snippet at a time. Remove only demonstrated duplication or unnecessary work; do not introduce cache cleaners, automatic memory purges, or undocumented client patches.
 
-The release foundation should have no recurring feature work while its demonstration is disabled. Development watching and bounded startup readiness checks should be accounted for separately from steady-state extension overhead. Real Spotify performance validation remains a local acceptance check, even when automated lifecycle tests pass.
+All current features are stylesheet-based and add no recurring feature JavaScript. Development watching and bounded startup readiness checks should be accounted for separately from steady-state extension overhead. Apply changes using `npm run local:apply` and test them in Spotify. Real performance comparisons still need the repeatable measurements above, even when lifecycle tests and visual acceptance checks pass.

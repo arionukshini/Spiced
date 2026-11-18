@@ -5,7 +5,7 @@
 <title>Spiced · Settings harness</title>
 <link rel="icon" href="data:,">
 <style>
-  :root { color-scheme: dark; --background-base:#121212; --text-base:#fff; --text-subdued:#b3b3b3; }
+  :root { color-scheme: dark; --background-base:#121212; --text-base:#fff; --text-subdued:#b3b3b3; --encore-shortest-1:50ms; --encore-shortest-2:100ms; --encore-shortest-3:150ms; --encore-shortest-4:200ms; }
   :root[data-theme="light"] { color-scheme:light; --background-base:#fff; --text-base:#181818; --text-subdued:#535353; }
   * { box-sizing:border-box; }
   body { margin:0; background:var(--background-base); color:var(--text-base); font:14px/1.5 system-ui,sans-serif; }
@@ -18,13 +18,63 @@
   .modal-heading h1 { font-size:20px; margin:0; }
   .modal-heading button { border:0; font-size:20px; line-height:1; padding:8px; }
   #menu { display:flex; gap:8px; }
+  #menu button { display:flex; align-items:center; gap:8px; }
+  .header-probe { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin:16px; }
+  .header-probe span { color:var(--text-subdued); }
+  .motion-probe { margin:16px; color:var(--text-subdued); }
+  .motion-probe-content { display:flex; align-items:center; gap:16px; padding:16px 0; flex-wrap:wrap; }
+  .motion-probe button { transition-property:transform; transition-duration:var(--encore-shortest-3); }
+  .motion-probe button:hover { transition-duration:var(--encore-shortest-1); }
+  .motion-probe-spinner { display:inline-block; width:12px; height:12px; border:2px solid currentColor; border-right-color:transparent; border-radius:50%; animation:probe-spin 1s linear infinite; }
+  .motion-probe-dot { display:inline-block; width:4px; height:4px; border-radius:50%; background:currentColor; animation:probe-pulse 1.32s linear infinite; }
+  .motion-probe-dot:nth-of-type(2) { animation-delay:var(--encore-shortest-2); }
+  .motion-probe-dot:nth-of-type(3) { animation-delay:var(--encore-shortest-4); }
+  @keyframes probe-spin { to { transform:rotate(360deg); } }
+  @keyframes probe-pulse { 50% { opacity:.25; } }
+  .artwork-probe { margin:16px; color:var(--text-subdued); }
+  .artwork-probe-grid { display:flex; gap:20px; flex-wrap:wrap; padding-top:16px; }
+  .artwork-probe figure { margin:0; }
+  .artwork-probe img, .artwork-probe .main-cardImage-imageWrapper, .artwork-probe .main-yourLibraryX-entryImageWrapper { display:block; width:64px; height:64px; border-radius:0; }
+  .artwork-probe .main-cardImage-circular, .artwork-probe .main-cardImage-circular img { border-radius:50%; }
+  .artwork-probe .main-yourLibraryX-entryImageWrapper { background:#555; box-shadow:0 2px 4px #000; }
+  .artwork-probe figcaption { margin-top:6px; font-size:12px; }
 </style>
 <nav aria-label="Preview controls">
   <span>Browser harness · mock Spicetify APIs</span>
   <button id="theme" type="button">Use light theme</button>
   <div id="menu"></div>
 </nav>
+<div class="header-probe" aria-label="Header icon validation">
+  <span>Header icons · development only</span>
+  <button id="fullscreen-tv-button" type="button">TV mode</button>
+  <button data-testid="whats-new-feed-button" class="main-topBar-buddyFeed" aria-label="What's New" type="button">Bell</button>
+  <button data-testid="friend-activity-button" data-restore-focus-key="buddy_feed" class="main-topBar-buddyFeed" aria-label="Listening activity" type="button">Friends</button>
+  <button id="probe-profile" type="button">Profile</button>
+  <button id="fullscreen-default-button" type="button">Player fullscreen</button>
+</div>
+<details class="motion-probe">
+  <summary>Motion validation · development only</summary>
+  <div class="motion-probe-content">
+    <label>Theme control duration <select id="probe-duration"><option value="150ms">150 ms (Spotify default)</option><option value="40ms">40 ms (faster theme)</option></select></label>
+    <button type="button" data-encore-id="buttonPrimary" id="probe-control">Motion test button <span aria-hidden="true" class="motion-probe-spinner"></span><span aria-hidden="true"><span class="motion-probe-dot"></span><span class="motion-probe-dot"></span><span class="motion-probe-dot"></span></span></button>
+  </div>
+</details>
+<details class="artwork-probe">
+  <summary>Artwork validation · development only</summary>
+  <div class="artwork-probe-grid">
+    <figure><div class="main-cardImage-imageWrapper" id="probe-album-wrapper"><img id="probe-album" class="main-cardImage-image" alt="Main album cover"></div><figcaption>Main cover</figcaption></figure>
+    <figure><div class="main-cardImage-imageWrapper main-cardImage-circular" id="probe-artist-wrapper"><img id="probe-artist" class="main-cardImage-image" alt="Circular artist portrait"></div><figcaption>Artist</figcaption></figure>
+    <figure class="main-yourLibraryX-library"><div role="row"><div class="main-yourLibraryX-entryImageWrapper" id="probe-library-wrapper"><img id="probe-library" data-testid="entity-image" alt="Library artwork"></div></div><figcaption>Library</figcaption></figure>
+    <figure><div data-testid="cover-art-button" id="probe-player-wrapper"><img id="probe-player" alt="Player artwork"></div><figcaption>Player</figcaption></figure>
+    <figure class="main-contextMenu"><img id="probe-menu" alt="Playlist menu artwork"><button id="probe-plus" type="button" aria-label="Create test playlist">+</button><figcaption>Playlist menu</figcaption></figure>
+    <figure><img id="probe-track" class="main-trackList-rowImage" alt="Track artwork"><figcaption>Track</figcaption></figure>
+    <figure><img id="probe-shortcut" class="view-homeShortcutsGrid-image" alt="Shortcut artwork"><figcaption>Shortcut</figcaption></figure>
+  </div>
+</details>
 <script>
+  const artworkSource = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#ff964f"/><circle cx="32" cy="32" r="22" fill="#5b2a14"/><circle cx="32" cy="32" r="11" fill="#ffcd9a"/><circle cx="32" cy="32" r="3" fill="#5b2a14"/></svg>');
+  for (const image of document.querySelectorAll('.artwork-probe img')) image.src = artworkSource;
+  document.querySelector('#probe-duration').onchange = event => document.documentElement.style.setProperty('--encore-shortest-3', event.target.value);
   const theme = document.querySelector('#theme');
   theme.onclick = () => {
     const light = document.documentElement.dataset.theme !== 'light';
@@ -35,7 +85,14 @@
   window.Spicetify = {
     LocalStorage: { get: key => localStorage.getItem(key), set: (key,value) => localStorage.setItem(key,value) },
     Menu: { Item: class {
-      constructor(name,_checked,onClick) { this.button = document.createElement('button'); this.button.textContent = name; this.button.onclick = onClick; }
+      constructor(name,_checked,onClick,icon) {
+        this.button = document.createElement('button');
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('width', '16'); svg.setAttribute('height', '16'); svg.setAttribute('viewBox', '0 0 16 16'); svg.setAttribute('aria-hidden', 'true');
+        svg.innerHTML = icon;
+        const label = document.createElement('span'); label.textContent = name;
+        this.button.append(svg,label); this.button.onclick = onClick;
+      }
       register() { document.querySelector('#menu').append(this.button); }
       deregister() { this.button.remove(); }
     } },

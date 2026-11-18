@@ -5,7 +5,8 @@ import { SettingsStore } from "./core/settings-store";
 import { StyleRegistry } from "./core/style-registry";
 import { features } from "./features";
 import { createSettings } from "./ui/settings";
-import settingsCSS from "./ui/settings.css";
+import { spicedMenuIcon } from "./ui/brand-icon";
+import settingsCSS from "./ui/settings.css?raw";
 
 export interface SpicedRuntime {
   version: string;
@@ -73,7 +74,7 @@ export function bootstrap(): SpicedRuntime {
           api.showNotification?.("Spiced settings could not be opened. See the console for details.", true);
         }
       };
-      const menu = new api.Menu!.Item("Spiced settings", false, runtime.openSettings, "<svg viewBox='0 0 16 16' fill='currentColor'><path d='M9 0 3 9h4l-1 7 7-10H9z'/></svg>");
+      const menu = new api.Menu!.Item("Spiced settings", false, runtime.openSettings, spicedMenuIcon);
       removeMenu = () => menu.deregister();
       menu.register();
       void featureManager.start().catch(error => log.error("Could not start features", error));

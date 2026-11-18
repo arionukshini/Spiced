@@ -4,11 +4,11 @@ A better Spotify, one tweak at a time.
 
 Spiced is a lightweight, modular quality-of-life extension for Spotify through Spicetify. It brings independently controlled CSS snippets and small enhancements into one maintainable extension, with orange accents and a settings panel that follows Spotify's theme.
 
-**This is the foundation release.** No existing snippets have been migrated. The only demonstration feature adds an orange border to a preview card inside Spiced's settings and is off by default.
+Spiced includes **Snappier controls** and the first migrated user-supplied snippet, **Round album covers**. Both are enabled by default and have independent switches. Version 0.4 adds opt-in **Hide icons**, with saved choices for individual header shortcuts. The optional **Orange preview border** demonstration remains off by default.
 
 ## Foundation
 
-- Native Spicetify profile-menu entry and settings modal.
+- Native Spicetify profile-menu entry and settings modal with a shared SVG chili icon.
 - Keyboard-accessible switches, visible status messages, light/dark theme colors, and reduced-motion support.
 - Persistent, versioned preferences with explicit warnings when saving fails.
 - Independent feature activation, compatibility checks, cancellation, and cleanup.
@@ -17,9 +17,18 @@ Spiced is a lightweight, modular quality-of-life extension for Spotify through S
 
 Spiced does not promise to reduce Spotify's internal RAM usage. The focus is small extension overhead and measurable changes. Read [Performance and measurement](docs/performance.md) before evaluating optimizations.
 
+## Included features
+
+| Feature | Category | Default | Effect |
+| --- | --- | --- | --- |
+| Round album covers | Appearance | On | Circular library, player, and playlist-menu artwork, with softly rounded main covers and thumbnails. |
+| Snappier controls | Interface | On | Shorter selected control transitions while preserving hover and loading timing. |
+| Hide icons | Interface | Off | Hide selected TV mode, What’s New, and Listening activity header shortcuts. |
+| Orange preview border | Appearance | Off | A removable CSS demonstration inside Spiced settings. |
+
 ## Build on Windows
 
-Install Node.js **22.16 or newer** and a working, compatible Spicetify/Spotify desktop installation. Run these commands in PowerShell from this project directory:
+Install Node.js **22.16 or newer**. Building and testing work without Spotify; applying the extension locally requires a compatible Spicetify/Spotify desktop installation. Run these commands in PowerShell from this project directory:
 
 ```powershell
 npm ci
@@ -33,12 +42,12 @@ Creator was evaluated before choosing the build system. Although the extension g
 ## Install locally
 
 ```powershell
-npm run local:install
-spicetify config extensions spiced.js
-spicetify apply
+npm run local:apply
 ```
 
-The installer finds the active configuration using `spicetify -c` and copies the bundle into the adjacent `Extensions` directory, normally `%APPDATA%\spicetify\Extensions`. It does not register the extension or restart Spotify itself. The `config extensions` command appends Spiced while preserving existing registrations; `apply` can restart Spotify.
+This builds, copies, registers, and applies Spiced, including Spotify's normal restart. Use it after changes so the installed client runs the version being tested. Existing extension registrations are preserved.
+
+The installer finds the active configuration using `spicetify -c` and copies the bundle into the adjacent `Extensions` directory, normally `%APPDATA%\spicetify\Extensions`. For a copy-only build without registration or restart, use `npm run local:install`.
 
 For a custom directory or an isolated installation test:
 
@@ -48,9 +57,15 @@ npm run local:install
 Remove-Item Env:\SPICED_EXTENSIONS_DIR
 ```
 
-This override controls the copy destination; make sure it matches the configuration you later activate. To install manually, copy `dist\spiced.js` into your custom `Extensions` folder, then run the same two Spicetify commands.
+This override controls the copy destination; make sure it matches the configuration you later activate. To install manually, copy `dist\spiced.js` into your custom `Extensions` folder, then run `spicetify config extensions spiced.js` and `spicetify apply`.
 
-Open Spotify's **profile menu → Spiced settings**. Enable **Orange preview border** and watch the preview card change. Disable it to remove the stylesheet immediately. Settings persist across Spotify restarts through `Spicetify.LocalStorage`; they are local to the client and shared across accounts on that client, rather than synchronized to Spotify.
+Open Spotify's **profile menu → Spiced settings**. Under **Interface**, **Snappier controls** is on by default unless you have saved a different preference. It caps the selected controls' normal Encore transition token at 75 ms, compared with Spotify's current 150 ms default. Existing 50 ms hover feedback remains unchanged, and Spiced's switches use 60 ms. The feature respects reduced-motion preferences and can be disabled immediately.
+
+**Hide icons** starts off. Open **Choose icons** to select **TV mode**, **What’s New**, and **Listening activity**; all three choices start selected. The master switch applies those choices, and turning it off restores the controls without forgetting your selections. You can adjust choices while it is off. Changes apply live and persist across restarts. TV mode is available only when its shortcut is installed; absent controls are harmless. Compatibility hooks are version-specific and may need updating after Spotify changes.
+
+Under **Appearance**, **Round album covers** makes library, player, and playlist-menu artwork circular. Main covers use a 10 px radius, category artwork 6 px, home shortcuts 4 px, and track thumbnails 3 px. Artist and profile images retain their circular shape. Disabling removes Spiced's styles immediately. Another active snippet can still apply the same rounding, so disable the matching Marketplace snippet when using the migrated version.
+
+Enable **Orange preview border** to try the small CSS demonstration. Each feature owns its injected stylesheet, which is removed when disabled. Settings persist across Spotify restarts through `Spicetify.LocalStorage`; they are local to the client and shared across accounts on that client, rather than synchronized to Spotify.
 
 To unregister Spiced:
 
@@ -87,11 +102,11 @@ window.Spiced.openSettings()
 await window.Spiced.dispose()
 ```
 
-`dispose()` releases Spiced's resources without erasing preferences. Reload Spotify to start it again. In DevTools, inspect `style[data-spiced-style]`; settings have their own style and the demo has one additional style only while enabled.
+`dispose()` releases Spiced's resources without erasing preferences. Reload Spotify to start it again. In DevTools, inspect `style[data-spiced-style]`; settings have their own style and each feature injects at most one additional stylesheet. Hide icons needs no stylesheet when all icon choices are off.
 
 If the menu is missing, inspect `[Spiced:startup]` errors and check that `expose_apis` is enabled in Spicetify. After correcting configuration, run `spicetify apply` and reload. Startup checks stop after 30 seconds. Missing storage leaves settings usable for the session with a visible warning. Unsupported features show their reason and a recheck action; failed features offer a retry without stopping others.
 
-## Add your snippets later
+## Adding more snippets
 
 Each feature lives in `src/features/<id>/`, exports metadata and activation logic, and is registered in `src/features/index.ts`. The settings row, persistent preference, error state, and lifecycle come from the shared foundation.
 
@@ -99,24 +114,33 @@ Read [Adding snippets and features](docs/adding-features.md) for the complete co
 
 The [architecture overview](docs/architecture.md) explains the runtime, settings storage, stylesheet ownership, cancellation, and practical limits of error isolation. Compatibility selectors and narrow Spicetify API types live in `src/compatibility/`.
 
+## GitHub and contributions
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution workflow. GitHub Actions runs type checking, tests, and a build on Windows and Linux for pushes and pull requests. The compiled `spiced.js` is available as the `spiced` artifact in the workflow run; generated bundles stay out of Git. Dependencies and Actions receive weekly Dependabot update checks.
+
+The repository is currently **unlicensed**. No open-source license has been selected, and npm publication is disabled with `private: true`.
+
 ## Validation
 
-`npm run check` covers preference validation and recovery, storage failures, CSS insertion/removal, rapid toggles, asynchronous cancellation, partial initialization failures, cleanup errors, guarded events, settings accessibility/focus, modal subscription cleanup, runtime restart restoration, and bounded startup.
+`npm run check` covers preference validation and recovery, storage failures, feature options, CSS insertion/removal, rapid toggles, asynchronous cancellation, partial initialization failures, cleanup errors, guarded events, settings accessibility/focus, modal subscription cleanup, runtime restart restoration, and bounded startup.
 
-Automated checks and the browser harness use simulated APIs. In your actual Spotify installation, confirm:
+Automated checks and the browser harness use simulated APIs. After applying a change, test it in the actual Spotify installation:
 
 1. The profile menu opens Spiced and keyboard focus remains usable when opening/closing settings.
-2. The demo's border appears/disappears and only one feature stylesheet exists when enabled.
-3. A Spotify restart restores the selected toggle state.
-4. Your light and dark themes keep text, focus indicators, and switches readable.
-5. Other extensions and Marketplace snippets continue to work with Spiced.
+2. Snappier controls applies and reverts its transition timings, with fast hover feedback and loading animation timing preserved.
+3. Round album covers applies and reverts the intended radii across library, player, cover, and menu surfaces while artist/profile images stay circular.
+4. Hide icons removes only the selected header shortcuts, restores each when deselected, and restores all when the master switch is off. Other header and player controls remain usable.
+5. The demo's border appears/disappears and no feature creates duplicate stylesheets.
+6. A Spotify restart restores the selected toggle states and individual icon choices.
+7. Your light and dark themes keep text, focus indicators, and switches readable; reduced motion stays respected.
+8. Other extensions and Marketplace snippets continue to work with Spiced.
 
 The tested native versions and any outstanding acceptance checks are recorded in [Validation notes](docs/validation.md). No internal Spotify memory or rendering performance improvement is claimed.
 
 ## Roadmap
 
 1. **Foundation:** maintain the small runtime, settings UI, lifecycle, and tests in this release.
-2. **Snippet intake:** review your supplied snippets, document their behavior and conflicts, and migrate one at a time behind disabled-by-default toggles.
+2. **Snippet intake:** continue reviewing supplied snippets one at a time, documenting their behavior and conflicts, and evaluating them behind independent toggles before choosing defaults.
 3. **Compatibility:** record supported surfaces and test each migrated feature against Spotify updates and your themes.
 4. **Performance:** profile modifications with recurring work or costly visual effects and retain reproducible evidence.
 5. **Distribution:** consider Marketplace packaging and release automation once the initial migrations are stable.
