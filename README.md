@@ -4,7 +4,7 @@ A better Spotify, one tweak at a time.
 
 Spiced is a lightweight, modular quality-of-life extension for Spotify through Spicetify. It brings independently controlled CSS snippets and small enhancements into one maintainable extension, with orange accents and a settings panel that follows Spotify's theme.
 
-Spiced includes **Snappier controls** and the first migrated user-supplied snippet, **Round album covers**. Both are enabled by default and have independent switches. Version 0.4 adds opt-in **Hide icons**, with saved choices for individual header shortcuts. The optional **Orange preview border** demonstration remains off by default.
+Spiced includes **Snappier controls** and **Round album covers**, plus optional artwork effects, header icon controls, and **Declutter Now Playing**. Every feature has its own persistent switch. Declutter includes individual choices for seven sidebar cards and placeholders. The optional **Orange preview border** demonstration remains off by default.
 
 ## Foundation
 
@@ -23,6 +23,7 @@ Spiced does not promise to reduce Spotify's internal RAM usage. The focus is sma
 | --- | --- | --- | --- |
 | Round album covers | Appearance | On | Circular library, player, and playlist-menu artwork, with softly rounded main covers and thumbnails. |
 | Snappier controls | Interface | On | Shorter selected control transitions while preserving hover and loading timing. |
+| Declutter Now Playing | Interface | Off | Individually hide Credits, About the artist, Related music videos, On tour, Lyrics, Next in queue, and loading placeholders. |
 | Hide icons | Interface | Off | Hide selected TV mode, What’s New, and Listening activity header shortcuts. |
 | Circular artwork shadow fix | Appearance | Off | Remove square shadows around circular player artwork. |
 | Spinning CD artwork | Appearance | Off | Circular artwork with playback-aware rotation and four speeds. |
@@ -79,6 +80,8 @@ spicetify apply
 Unregistering preserves preferences. Spiced never clears other extensions' storage.
 
 Both new artwork effects are under **Appearance** and start off. **Spinning CD artwork** has a **Rotation speed** selector: 10, 30 (default), 60 or 360 seconds per turn. It targets the current bottom-player and Now Playing artwork wrappers, pauses with playback, and keeps a static CD when reduced motion is requested. Speed changes apply live. **Circular artwork shadow fix** is independent of both spinning and Round album covers.
+
+**Declutter Now Playing** is under **Interface → Choose what to hide**. Its master starts off; the initial choices hide Credits, About the artist, Related music videos, On tour, and loading placeholders while retaining Lyrics and Next in queue. Each choice saves independently and applies live when the master is on. It affects only the Now Playing sidebar, including compatible lyrics extension cards. Artwork, track details, player controls and the actual playback queue remain available. The old snippets' generated layout classes and forced full-height centring are deliberately omitted.
 
 ## Development and debugging
 

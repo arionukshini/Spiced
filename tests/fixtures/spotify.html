@@ -21,6 +21,7 @@
   #menu button { display:flex; align-items:center; gap:8px; }
   .header-probe { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin:16px; }
   .header-probe span { color:var(--text-subdued); }
+  .cd-probe [data-testid="cover-art-slot"] { position:relative; }
   .cd-probe [data-testid="cover-art-slot"]::after { content:""; position:absolute; width:100%; height:100%; filter:blur(10px); }
   .motion-probe { margin:16px; color:var(--text-subdued); }
   .motion-probe-content { display:flex; align-items:center; gap:16px; padding:16px 0; flex-wrap:wrap; }
@@ -58,6 +59,23 @@
   <button data-testid="cover-art-button" style="width:64px;height:64px;padding:0"><img class="cd-art" alt="CD player artwork" width="64" height="64"></button>
   <div data-testid="cover-art-slot" style="width:128px;height:128px;box-shadow:0 0 12px #555"><div class="main-nowPlayingView-coverArtVisualEnhancement"><img class="cd-art" alt="CD panel artwork" width="128" height="128"></div></div>
 </div>
+<details class="artwork-probe">
+  <summary>Now Playing cards · development only</summary>
+  <aside id="Desktop_PanelContainer_Id" style="display:grid;gap:12px;padding:12px;max-width:360px">
+    <div id="npv-videos" class="main-nowPlayingView-section l5YdKPM8Ayc0mg7Zy6Gg"><div aria-label="Related music videos">Related music videos</div></div>
+    <div id="npv-tour" class="main-nowPlayingView-section nhcTY9t3aA49TPoP8ok4">On tour</div>
+    <div id="npv-artwork">Artwork and track details stay visible</div>
+    <section id="npv-credits"><div class="main-nowPlayingView-credits"><h2 class="main-nowPlayingView-creditsHeader">Credits</h2></div></section>
+    <div id="npv-artist" class="main-nowPlayingView-section main-nowPlayingView-aboutArtist">About the artist</div>
+    <div id="npv-lyrics" data-testid="lyrics-npv-section">Spotify lyrics</div>
+    <section id="npv-queue"><div class="main-nowPlayingView-queue">Next in queue</div></section>
+    <div id="npv-loading" data-testid="skeleton-section">Loading card</div>
+    <div id="npv-plugin-lyrics" class="lyrics-npv-card">Extension lyrics</div>
+    <div id="SpicyLyricsNPVCard">Current Spicy Lyrics card</div>
+    <div id="npv-plugin-loading" class="LoadingLyricsCard">Extension loading card</div>
+  </aside>
+  <div id="npv-outside-loading" class="Loading">Unrelated loading indicator</div>
+</details>
 <details class="motion-probe">
   <summary>Motion validation · development only</summary>
   <div class="motion-probe-content">

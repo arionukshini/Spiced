@@ -4,6 +4,7 @@ import { roundAlbumCovers } from "./round-album-covers";
 import { hideIcons } from "./hide-icons";
 import { circularShadowFix } from "./circular-shadow-fix";
 import { spinningCD } from "./spinning-cd";
+import { declutterNowPlaying } from "./declutter-now-playing";
 import type { FeatureDefinition } from "../core/types";
 
-export const features: readonly FeatureDefinition[] = [orangeDemo, snappyControls, roundAlbumCovers, hideIcons, circularShadowFix, spinningCD];
+export const features: readonly FeatureDefinition[] = [orangeDemo, snappyControls, roundAlbumCovers, hideIcons, circularShadowFix, spinningCD, declutterNowPlaying];
