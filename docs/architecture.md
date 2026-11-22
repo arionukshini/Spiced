@@ -1,6 +1,6 @@
 # Architecture
 
-Spiced is a TypeScript extension bundled into one `dist/spiced.js` file. It has no production npm dependencies, network requests, UI framework, or background feature polling. CSS imports are bundled as text and installed through an owned style registry.
+Spiced is a TypeScript extension bundled into one `dist/spiced.js` file. It has no production npm dependencies, UI framework, or background feature polling. CSS imports are bundled as text and installed through an owned style registry. The optional Full album date feature requests Spotify album metadata only when visiting an album page.
 
 The official extension guide still mentions Creator, but the [official Creator repository](https://github.com/spicetify/spicetify-creator) marks it deprecated and recommends using a bundler directly. Spiced uses esbuild with a small project-owned configuration. [Extension development guide](https://spicetify.app/docs/development/extensions)
 
@@ -48,6 +48,12 @@ Its version-specific hooks live in `src/compatibility/selectors.ts`: `#fullscree
 **Orange preview border** (`orange-demo`, Appearance) remains an optional, disabled-by-default demonstration of style ownership. It only changes a preview card inside Spiced's settings.
 
 ## Feature lifecycle
+
+**Full album date** (`full-album-date`, Interface) is off by default. Activation waits up to 30 seconds for History and album metadata APIs, checking every 250 ms only while they are unavailable. This handles Spicetify exposing them after the settings menu during launch. Disabling cancels the wait immediately; a timeout reports the missing API with a manual retry. Once ready, the feature requests the current album through `Spicetify.GraphQL.Request` and the client's `getAlbum` definition, with one track requested to keep the track payload small. Definitions and response fields remain Spotify internals; their availability and the album identity are checked before use. Navigation uses `Platform.History.listen`. See the documented [GraphQL wrapper](https://spicetify.app/docs/development/api-wrapper/methods/graphql) and [History API](https://spicetify.app/docs/development/api-wrapper/methods/platform#history).
+
+The formatter respects `DAY`, `MONTH`, and `YEAR` precision: `13th October 2026`, `October 2026`, or the original year. It validates calendar dates and reads the date components without local-time conversion. Unsupported metadata is left unchanged. The semantic album-page and release-date test IDs are centralized in `src/compatibility/selectors.ts`; only a plain year text node is replaced, preserving the surrounding tooltip and header structure. Prerelease announcements and already-customized date fields are left alone. While enabled, an owned stylesheet suppresses the duplicate separator `::before` added by legacy styling on nonempty album-header separators, preserving Spotify's actual bullet and its spacing. Disabling removes that stylesheet with the date modification.
+
+If the header is still loading, a temporary observer watches the main content container for at most ten seconds after metadata arrives, disconnecting on success, navigation, or disable. There is no recurring polling or idle observer. Navigation invalidates late responses; disabling removes the History listener and restores the original text only when it still contains Spiced's replacement. The underlying GraphQL request cannot be cancelled through this wrapper, so late responses are ignored. Avoid enabling another album-date extension at the same time.
 
 Each registered feature has a unique stable ID, metadata, category, default enabled state, optional support check, and activation function. Activation can return cleanup or register cleanup incrementally through its context. Features are independent and do not activate each other.
 

@@ -1,4 +1,7 @@
 export const selectors = {
+  albumReleaseDate: '[data-testid="album-page"] [data-testid="release-date"]',
+  albumHeaderSeparators: '[data-testid="album-page"] .main-entityHeader-metaData > [data-separator="true"]:not(:empty)',
+  mainView: ".main-view-container",
   demoPreview: ".spiced-settings [data-spiced-demo]",
   motionControls: ["button", "buttonPrimary", "buttonSecondary", "buttonTertiary", "buttonIcon", "tabItem", "menuRow", "formToggle", "textLink"]
     .map(id => `[data-encore-id="${id}"]`).join(",\n"),

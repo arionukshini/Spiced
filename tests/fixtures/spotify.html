@@ -76,6 +76,15 @@
   </aside>
   <div id="npv-outside-loading" class="Loading">Unrelated loading indicator</div>
 </details>
+<details class="artwork-probe" open>
+  <summary>Album release date · development only</summary>
+  <main class="main-view-container" id="album-date-probe">
+    <section data-testid="album-page"><div class="main-entityHeader-metaData" style="display:flex;gap:8px;padding:12px">
+      <span>Example artist</span><span data-separator="true">•</span><span data-testid="release-date">2026</span><span data-separator="true">•</span><span>13 songs, 26 min 26 sec</span>
+    </div></section>
+  </main>
+</details>
+<style>#album-date-probe [data-separator="true"]::before { content: "•"; }</style>
 <details class="motion-probe">
   <summary>Motion validation · development only</summary>
   <div class="motion-probe-content">
@@ -108,12 +117,22 @@
   let modal;
   let playing = false;
   const playback = new EventTarget();
+  const albumHistoryListeners = new Set();
+  const albumHistory = {
+    location: { pathname: '/album/aaaaaaaaaaaaaaaaaaaaaa' },
+    listen(listener) { albumHistoryListeners.add(listener); return () => albumHistoryListeners.delete(listener); }
+  };
   document.querySelector('#probe-playback').onclick = event => {
     playing = !playing;
     event.target.textContent = playing ? 'Simulate pause' : 'Simulate playback';
     playback.dispatchEvent(new Event('onplaypause'));
   };
   window.Spicetify = {
+    Platform: { History: albumHistory },
+    GraphQL: {
+      Definitions: { getAlbum: {} },
+      Request: async (_definition, {uri}) => ({ data: { albumUnion: { __typename: 'Album', uri, date: { isoString: '2026-10-13T00:00:00Z', precision: 'DAY' } } } })
+    },
     Player: { isPlaying: () => playing, addEventListener: (type, cb) => playback.addEventListener(type, cb), removeEventListener: (type, cb) => playback.removeEventListener(type, cb) },
     LocalStorage: { get: key => localStorage.getItem(key), set: (key,value) => localStorage.setItem(key,value) },
     Menu: { Item: class {

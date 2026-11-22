@@ -1,5 +1,21 @@
 # Validation record
 
+## Full album date and album separators — November 20, 2026
+
+After the user authorized testing and application, `npm run check` passed strict TypeScript checking, **68 tests across ten files**, and the production build. The bundle is **44,886 bytes**. New coverage includes ordinal suffixes, calendar validity and partial precision, live restoration, delayed headers, navigation and cancellation, persisted preferences, delayed API readiness, readiness timeout and retry, request failure isolation, and separator style ownership. `git diff --check` passed.
+
+`npm run local:apply` completed successfully, preserving the `spiced.js` and `star-ratings.js` registrations. The built and installed bundles have matching SHA-256 hashes: `03495BE156228E566B1D66BADA380CB02BFCD9E30363AA8BC6000B62FB7F95FD`.
+
+In the actual Spotify desktop client (1.3.4.258, Spicetify 2.46.7), live checks through its developer interface confirmed:
+
+- The saved enabled switch initialized to **On** after a fresh launch without **Check again**. The previous immediate capability check had incorrectly reported a missing History API before Spicetify finished exposing it.
+- THE RITUAL (`1mk53meB7tdBgobX5Y2AKx`) displayed **17th November 2026**. Turning the settings switch off restored **2026** and removed its owned style; turning it back on restored the full date and **All changes saved**.
+- Navigation to ZapSki (`76pAfxTP9PpVbY3nKm82ho`) displayed **18th November 2026**, matching Spotify's album metadata. Returning to THE RITUAL restored its correct full date, with one owned stylesheet.
+- Both header separators retained their actual bullet while their duplicate `::before` content became `none`. The corrected album header was also visually inspected in the native Spotify window.
+- The enabled preference survived relaunch. A final normal launch without the temporary developer-debugging flag was visually checked: opening THE RITUAL still showed **17th November 2026** with single separators. Other saved feature choices remained unchanged.
+
+The Chromium browser harness separately verified the fixture's **13th October 2026**, single separators, off/on restoration, and reload persistence. Screenshots confirmed the date in both light and dark themes. These use mock metadata and are not native Spotify tests. Native month-only/year-only metadata and artificially delayed responses were not forced; their handling is covered by automated tests. The records below cover earlier releases.
+
 This record covers **Spiced v0.3.0** on Windows. Automated, browser-harness, and native Spotify results are listed separately. The build and apply checks below were performed on **November 16, 2026**; native toggle and restart-persistence checks were completed on **November 17, 2026**.
 
 ## Automated checks

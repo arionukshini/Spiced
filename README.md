@@ -25,6 +25,7 @@ Spiced does not promise to reduce Spotify's internal RAM usage. The focus is sma
 | Snappier controls | Interface | On | Shorter selected control transitions while preserving hover and loading timing. |
 | Declutter Now Playing | Interface | Off | Individually hide Credits, About the artist, Related music videos, On tour, Lyrics, Next in queue, and loading placeholders. |
 | Hide icons | Interface | Off | Hide selected TV mode, What’s New, and Listening activity header shortcuts. |
+| Full album date | Interface | Off | Replace the album header year with a release date such as 13th October 2026, when Spotify provides day precision. |
 | Circular artwork shadow fix | Appearance | Off | Remove square shadows around circular player artwork. |
 | Spinning CD artwork | Appearance | Off | Circular artwork with playback-aware rotation and four speeds. |
 | Orange preview border | Appearance | Off | A removable CSS demonstration inside Spiced settings. |

@@ -4,6 +4,16 @@ export interface StorageAPI {
 }
 
 export interface SpicetifyAPI {
+  Platform?: {
+    History?: {
+      location: { pathname: string };
+      listen(listener: (location: { pathname: string }) => void): () => void;
+    };
+  };
+  GraphQL?: {
+    Definitions?: Record<string, unknown>;
+    Request?: (definition: unknown, variables: Record<string, unknown>) => Promise<unknown>;
+  };
   Player?: {
     isPlaying(): boolean;
     addEventListener(type: string, callback: () => void): void;
